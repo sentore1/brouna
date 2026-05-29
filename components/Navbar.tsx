@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ShoppingBag, User, Menu, X } from 'lucide-react'
+import { ShoppingBag, User, Menu, X, Search } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
@@ -77,7 +77,7 @@ export default function Navbar({
   }
 
   return (
-    <nav className={`sticky top-0 z-50 ${getHeaderClasses()}`}>
+    <nav className={`sticky top-0 z-50 group/nav ${getHeaderClasses()}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center" style={{ minHeight: `${Math.max(64, logoSize + 16)}px` }}>
           <Link href="/" className="flex items-center space-x-3">
@@ -92,10 +92,10 @@ export default function Navbar({
           
           {/* Regular navigation for other pages */}
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             {/* Show categories only on home page — right side */}
             {isHomePage && (
-              <div className="hidden md:flex items-center space-x-6 mr-2">
+              <div className="hidden md:flex items-center space-x-4 mr-1">
                 {categories.map(category => (
                   <button
                     key={category}
@@ -113,7 +113,7 @@ export default function Navbar({
             )}
             {/* Regular navigation for other pages — right side */}
             {!isHomePage && (
-              <div className="hidden md:flex items-center space-x-6 mr-2">
+              <div className="hidden md:flex items-center space-x-4 mr-1">
                 <Link href="/" className={`text-[10px] font-medium ${getTextClasses()} ${getHoverClasses()} transition-colors`}>
                   Home
                 </Link>
@@ -124,22 +124,22 @@ export default function Navbar({
             )}
             {/* Search - show only on home page */}
             {isHomePage && (
-              <div className="hidden md:block">
+              <div className="hidden md:flex items-center group relative opacity-0 group-hover/nav:opacity-100 transition-opacity duration-200">
                 <input
                   type="text"
-                  placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => onSearchChange?.(e.target.value)}
-                  className="px-3 py-1.5 w-40 text-xs border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  className="w-0 group-hover:w-36 focus:w-36 overflow-hidden transition-all duration-300 text-xs border-b border-transparent group-hover:border-gray-300 focus:border-black focus:outline-none bg-transparent mr-1 py-0.5 text-right"
                 />
+                <Search className={`w-4 h-4 cursor-pointer flex-shrink-0 ${getTextClasses()}`} />
               </div>
             )}
             
-            <Link href="/login" className={`p-2 rounded-full transition-colors ${headerStyle === 'fashion' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}>
-              <User className={`w-5 h-5 ${getTextClasses()}`} />
+            <Link href="/login" className={`p-1 rounded-full transition-colors ${headerStyle === 'fashion' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}>
+              <User className={`w-4 h-4 ${getTextClasses()}`} />
             </Link>
-            <Link href="/cart" className={`p-2 rounded-full transition-colors relative ${headerStyle === 'fashion' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}>
-              <ShoppingBag className={`w-5 h-5 ${getTextClasses()}`} />
+            <Link href="/cart" className={`p-1 rounded-full transition-colors relative ${headerStyle === 'fashion' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}>
+              <ShoppingBag className={`w-4 h-4 ${getTextClasses()}`} />
               {cartCount > 0 && (
                 <span className={`absolute -top-1 -right-1 text-xs rounded-full w-5 h-5 flex items-center justify-center ${
                   headerStyle === 'fashion' ? 'bg-white text-black' : 'bg-black text-white'

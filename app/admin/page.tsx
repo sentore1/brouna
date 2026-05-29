@@ -80,6 +80,8 @@ interface SiteSettings {
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('products')
   const [uploadingSpotlight, setUploadingSpotlight] = useState(false)
+  const [reviews, setReviews] = useState<{id: string, author: string, text: string, rating: number, sort_order: number}[]>([])
+  const [newReview, setNewReview] = useState({ author: '', text: '', rating: 5 })
   const [footerLinks, setFooterLinks] = useState<{id: string, label: string, url: string, sort_order: number, enabled: boolean}[]>([])
   const [newFooterLink, setNewFooterLink] = useState({ label: '', url: '' })
   const [pages, setPages] = useState<{id: string, title: string, slug: string, content: string, enabled: boolean}[]>([])
@@ -158,10 +160,14 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      // First try getSession (fast, from storage)
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session || session.user.email !== '4brohz@gmail.com') {
+      if (session && session.user.email === '4brohz@gmail.com') return
+
+      // If no session yet, wait for auth state to resolve
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || user.email !== '4brohz@gmail.com') {
         router.push('/login')
-        return
       }
     }
     checkAuth()
@@ -170,6 +176,7 @@ export default function AdminDashboard() {
     fetchCategories()
     fetchFooterLinks()
     fetchPages()
+    fetchReviews()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchCategories = async () => {
@@ -326,6 +333,7 @@ export default function AdminDashboard() {
           spotlight_link: (siteSettings as any).spotlight_link ?? '',
           spotlight_width: (siteSettings as any).spotlight_width ?? 320,
           spotlight_bg_color: (siteSettings as any).spotlight_bg_color ?? '#f5f5f5',
+          reviews_enabled: (siteSettings as any).reviews_enabled ?? false,
         }
 
         // Store MoMo settings and logo in site_logo as JSON (workaround for missing columns)
@@ -489,6 +497,40 @@ export default function AdminDashboard() {
   const fetchPages = async () => {
     const { data } = await supabase.from('pages').select('*').order('sort_order')
     if (data) setPages(data)
+  }
+
+  const fetchReviews = async () => {
+    const res = await fetch('/api/reviews')
+    if (res.ok) setReviews(await res.json())
+  }
+
+  const addReview = async () => {
+    if (!newReview.author.trim() || !newReview.text.trim()) return
+    await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newReview, sort_order: reviews.length }),
+    })
+    setNewReview({ author: '', text: '', rating: 5 })
+    fetchReviews()
+  }
+
+  const deleteReview = async (id: string) => {
+    await fetch('/api/reviews', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    fetchReviews()
+  }
+
+  const updateReview = async (id: string, updates: any) => {
+    await fetch('/api/reviews', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...updates }),
+    })
+    fetchReviews()
   }
 
   const savePage = async () => {
@@ -899,6 +941,89 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Customer Reviews */}
+              <div className="border-t pt-6">
+                <h3 className="text-base font-medium mb-4">Customer Reviews</h3>
+                <div className="space-y-4">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={!!(siteSettings as any).reviews_enabled}
+                      onChange={(e) => setSiteSettings({...siteSettings, reviews_enabled: e.target.checked} as any)}
+                      className="w-4 h-4"
+                    />
+                    <span className="font-medium">Show Reviews on Homepage</span>
+                  </label>
+
+                  {/* Existing reviews */}
+                  {reviews.length > 0 && (
+                    <div className="space-y-2">
+                      {reviews.map((r) => (
+                        <div key={r.id} className="border rounded p-3 flex gap-3 items-start">
+                          <div className="flex-1 space-y-1">
+                            <input
+                              type="text"
+                              value={r.author}
+                              onChange={(e) => updateReview(r.id, { author: e.target.value })}
+                              className="w-full text-xs font-medium border-b border-transparent hover:border-gray-300 focus:border-black focus:outline-none py-0.5"
+                              placeholder="Author name"
+                            />
+                            <textarea
+                              value={r.text}
+                              onChange={(e) => updateReview(r.id, { text: e.target.value })}
+                              className="w-full text-xs text-gray-600 border-b border-transparent hover:border-gray-300 focus:border-black focus:outline-none resize-none py-0.5"
+                              rows={2}
+                              placeholder="Review text"
+                            />
+                            <div className="flex gap-1">
+                              {[1,2,3,4,5].map(s => (
+                                <button key={s} onClick={() => updateReview(r.id, { rating: s })}
+                                  className={`text-xs ${s <= r.rating ? 'text-black' : 'text-gray-300'}`}>★</button>
+                              ))}
+                            </div>
+                          </div>
+                          <button onClick={() => deleteReview(r.id)} className="text-gray-400 hover:text-red-500 text-xs mt-1">✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add new review */}
+                  <div className="border rounded p-3 space-y-2 bg-gray-50">
+                    <p className="text-xs font-medium text-gray-700">Add Review</p>
+                    <input
+                      type="text"
+                      value={newReview.author}
+                      onChange={(e) => setNewReview({...newReview, author: e.target.value})}
+                      className="w-full p-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-black"
+                      placeholder="Customer name"
+                    />
+                    <textarea
+                      value={newReview.text}
+                      onChange={(e) => setNewReview({...newReview, text: e.target.value})}
+                      className="w-full p-2 text-xs border border-gray-300 rounded focus:outline-none focus:border-black resize-none"
+                      rows={2}
+                      placeholder="Review text"
+                    />
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-600">Rating:</span>
+                      <div className="flex gap-1">
+                        {[1,2,3,4,5].map(s => (
+                          <button key={s} onClick={() => setNewReview({...newReview, rating: s})}
+                            className={`text-sm ${s <= newReview.rating ? 'text-black' : 'text-gray-300'}`}>★</button>
+                        ))}
+                      </div>
+                    </div>
+                    <button
+                      onClick={addReview}
+                      className="bg-black text-white text-xs px-4 py-1.5 rounded hover:bg-gray-800 transition-colors"
+                    >
+                      Add Review
+                    </button>
+                  </div>
                 </div>
               </div>
 
