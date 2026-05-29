@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { polarApi } from '../../../../lib/polar'
+import type { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,16 +17,16 @@ export async function POST(request: NextRequest) {
 
     // Create checkout session with ad-hoc pricing so the actual cart total is charged,
     // not the fixed price set on the product in the Polar dashboard.
+    const prices: CheckoutCreate['prices'] = {}
+    prices[productId] = [{
+      amountType: 'fixed',
+      priceAmount: Math.round(amount * 100),
+      priceCurrency: (currency as string).toLowerCase() as import('@polar-sh/sdk/models/components/presentmentcurrency').PresentmentCurrency,
+    }]
+
     const checkoutSession = await polarApi.checkouts.create({
       products: [productId],
-      // Override the product price with the real cart total (Polar expects cents)
-      prices: {
-        [productId]: [{
-          amountType: 'fixed',
-          priceAmount: Math.round(amount * 100),
-          priceCurrency: (currency as string).toLowerCase(),
-        }]
-      },
+      prices,
       successUrl: `${process.env.NEXTAUTH_URL}/order-success?checkout_id={CHECKOUT_ID}`,
       customerEmail,
       customerIpAddress: customerIp !== 'unknown' ? customerIp : undefined,
