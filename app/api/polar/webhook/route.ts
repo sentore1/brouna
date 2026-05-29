@@ -8,14 +8,14 @@ export const POST = Webhooks({
     console.log('Polar webhook received:', payload.type)
   },
 
-  onCheckoutCreated: async (checkout) => {
-    console.log('Checkout created:', checkout.id)
+  onCheckoutCreated: async (payload) => {
+    console.log('Checkout created:', payload.data.id)
   },
 
-  onCheckoutUpdated: async (checkout) => {
-    console.log('Checkout updated:', checkout.id, 'Status:', checkout)
+  onCheckoutUpdated: async (payload) => {
+    const checkout = payload.data
+    console.log('Checkout updated:', checkout.id, 'Status:', checkout.status)
     
-    // When checkout payment is fully completed, update order status
     // 'confirmed' = customer submitted form (processing), 'succeeded' = payment done
     if (checkout.status === 'succeeded') {
       const orderId = checkout.metadata?.orderId
@@ -42,10 +42,10 @@ export const POST = Webhooks({
     }
   },
 
-  onOrderCreated: async (order) => {
+  onOrderCreated: async (payload) => {
+    const order = payload.data
     console.log('Order created:', order.id)
     
-    // Update order in database with Polar order details
     try {
       const { error } = await supabase
         .from('orders')
@@ -63,15 +63,36 @@ export const POST = Webhooks({
     }
   },
 
-  onSubscriptionCreated: async (subscription) => {
-    console.log('Subscription created:', subscription.id)
+  onOrderPaid: async (payload) => {
+    const order = payload.data
+    console.log('Order paid:', order.id)
+
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ 
+          status: 'completed',
+          polar_order_id: order.id,
+        })
+        .eq('transaction_id', order.checkoutId)
+
+      if (error) {
+        console.error('Failed to update order on payment:', error)
+      }
+    } catch (err) {
+      console.error('Error updating order on payment:', err)
+    }
   },
 
-  onSubscriptionUpdated: async (subscription) => {
-    console.log('Subscription updated:', subscription.id)
+  onSubscriptionCreated: async (payload) => {
+    console.log('Subscription created:', payload.data.id)
   },
 
-  onSubscriptionCanceled: async (subscription) => {
-    console.log('Subscription canceled:', subscription.id)
+  onSubscriptionUpdated: async (payload) => {
+    console.log('Subscription updated:', payload.data.id)
+  },
+
+  onSubscriptionCanceled: async (payload) => {
+    console.log('Subscription canceled:', payload.data.id)
   },
 });
