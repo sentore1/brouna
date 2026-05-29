@@ -464,11 +464,11 @@ export default function CheckoutPage() {
             {/* Polar Payment */}
             {paymentMethod === 'polar' && (
               <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-blue-800">
+                <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-800">
                     <strong>Secure Payment via Polar</strong>
                   </p>
-                  <p className="text-xs text-blue-600 mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     Polar handles all payment processing, tax compliance, and provides instant access to your purchase.
                   </p>
                 </div>
@@ -496,7 +496,7 @@ export default function CheckoutPage() {
                 <button 
                   onClick={handlePolarCheckout}
                   disabled={loading || !formData.email || !formData.name}
-                  className="w-full bg-blue-600 text-white py-4 font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-black text-white py-4 font-medium hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Processing...' : `Continue to Polar Checkout - ${formatPrice(total, currency)}`}
                 </button>

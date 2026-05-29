@@ -48,7 +48,17 @@ export default function Footer() {
   const fetchSettings = async () => {
     try {
       const { data } = await supabase.from('site_settings').select('*').single()
-      if (data) setSettings(data)
+      if (data) {
+        // site_logo may be stored as JSON (with momo settings embedded)
+        let siteLogo = data.site_logo
+        if (siteLogo && siteLogo.startsWith('{')) {
+          try {
+            const parsed = JSON.parse(siteLogo)
+            siteLogo = parsed.logo || ''
+          } catch {}
+        }
+        setSettings({ ...data, site_logo: siteLogo })
+      }
     } catch {}
   }
 

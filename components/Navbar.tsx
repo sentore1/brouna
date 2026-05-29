@@ -90,38 +90,38 @@ export default function Navbar({
             )}
           </Link>
           
-          {/* Show categories only on home page */}
-          {isHomePage && (
-            <div className="hidden md:flex items-center space-x-8">
-              {categories.map(category => (
-                <button
-                  key={category}
-                  onClick={() => onCategoryChange?.(category)}
-                  className={`text-sm font-medium transition-colors ${
-                    selectedCategory === category 
-                      ? getActiveClasses()
-                      : `${getTextClasses()} ${getHoverClasses()}`
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Regular navigation for other pages */}
-          {!isHomePage && (
-            <div className="hidden md:flex space-x-8">
-              <Link href="/" className={`${getTextClasses()} ${getHoverClasses()} transition-colors`}>
-                Home
-              </Link>
-              <Link href="/products" className={`${getTextClasses()} ${getHoverClasses()} transition-colors`}>
-                Products
-              </Link>
-            </div>
-          )}
 
           <div className="flex items-center space-x-4">
+            {/* Show categories only on home page — right side */}
+            {isHomePage && (
+              <div className="hidden md:flex items-center space-x-6 mr-2">
+                {categories.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => onCategoryChange?.(category)}
+                    className={`text-[10px] font-medium transition-colors ${
+                      selectedCategory === category
+                        ? getActiveClasses()
+                        : `${getTextClasses()} ${getHoverClasses()}`
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            )}
+            {/* Regular navigation for other pages — right side */}
+            {!isHomePage && (
+              <div className="hidden md:flex items-center space-x-6 mr-2">
+                <Link href="/" className={`text-[10px] font-medium ${getTextClasses()} ${getHoverClasses()} transition-colors`}>
+                  Home
+                </Link>
+                <Link href="/products" className={`text-[10px] font-medium ${getTextClasses()} ${getHoverClasses()} transition-colors`}>
+                  Products
+                </Link>
+              </div>
+            )}
             {/* Search - show only on home page */}
             {isHomePage && (
               <div className="hidden md:block">

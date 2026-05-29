@@ -160,7 +160,7 @@ function BrandWidget({ section }: { section: any }) {
       {/* Badge — left side, bottom of section */}
       {section.brand_badge_text && (
         <div className="absolute left-8 z-20 bottom-6">
-          <span className="font-light text-gray-800 tracking-wide" style={{ fontSize: '3.5rem' }}>
+          <span className="font-semibold text-gray-900 tracking-wide" style={{ fontSize: '3.5rem' }}>
             {section.brand_badge_text}
           </span>
         </div>
@@ -168,7 +168,7 @@ function BrandWidget({ section }: { section: any }) {
 
       {/* Overlay text — right side, bottom of section */}
       {section.brand_overlay_text && (
-        <div className="absolute right-8 z-20 max-w-[200px] bottom-6">
+        <div className="absolute z-20 bottom-6" style={{ left: '76%', right: '2rem' }}>
           <p className="text-xs text-gray-500 leading-relaxed">{section.brand_overlay_text}</p>
           {section.brand_overlay_subtext && (
             <p className="text-xs text-gray-400 mt-1">{section.brand_overlay_subtext}</p>

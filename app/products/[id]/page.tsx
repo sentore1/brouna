@@ -23,23 +23,10 @@ interface Product {
   viewers_count?: number
 }
 
-interface SpotlightSettings {
-  spotlight_enabled: boolean
-  spotlight_image: string
-  spotlight_title: string
-  spotlight_subtitle: string
-  spotlight_price: string
-  spotlight_price_prefix: string
-  spotlight_link: string
-  spotlight_width: number
-  spotlight_bg_color: string
-}
-
 export default function ProductDetail() {
   const params = useParams()
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)
-  const [spotlight, setSpotlight] = useState<SpotlightSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [zoomType, setZoomType] = useState<'simple' | 'detailed'>('simple')
@@ -58,7 +45,6 @@ export default function ProductDetail() {
   useEffect(() => {
     fetchProduct()
     fetchButtonLabel()
-    fetchSpotlight()
   }, [params.id])
 
   useEffect(() => {
@@ -165,28 +151,6 @@ export default function ProductDetail() {
     }
   }
 
-  const fetchSpotlight = async () => {
-    try {
-      const response = await fetch('/api/settings')
-      if (response.ok) {
-        const settings = await response.json()
-        setSpotlight({
-          spotlight_enabled: settings.spotlight_enabled ?? false,
-          spotlight_image: settings.spotlight_image ?? '',
-          spotlight_title: settings.spotlight_title ?? '',
-          spotlight_subtitle: settings.spotlight_subtitle ?? '',
-          spotlight_price: settings.spotlight_price ?? '',
-          spotlight_price_prefix: settings.spotlight_price_prefix ?? 'From',
-          spotlight_link: settings.spotlight_link ?? '',
-          spotlight_width: settings.spotlight_width ?? 320,
-          spotlight_bg_color: settings.spotlight_bg_color ?? '#f5f5f5',
-        })
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
   const nextImage = () => {
     if (product?.images) {
       setCurrentImageIndex((prev) => (prev + 1) % product.images!.length)
@@ -199,7 +163,7 @@ export default function ProductDetail() {
     }
   }
 
-  if (loading) return <div className="min-h-screen bg-white flex items-center justify-center pt-16"><div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black"></div></div>
+  if (loading) return <div className="min-h-screen bg-white flex items-center justify-center pt-16"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div></div>
 
   if (!product) return (
     <div className="min-h-screen bg-white flex items-center justify-center pt-16">
@@ -530,57 +494,6 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
-
-      {/* Product Spotlight Widget */}
-      {spotlight?.spotlight_enabled && spotlight.spotlight_title && (
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div
-            className="relative overflow-hidden rounded-2xl w-full"
-            style={{
-              backgroundColor: spotlight.spotlight_bg_color || '#f5f5f5',
-              minHeight: '380px',
-            }}
-          >
-            {/* Text — top left */}
-            <div className="absolute top-8 left-8 z-10">
-              <p className="text-2xl font-bold text-gray-900 leading-tight">{spotlight.spotlight_title}</p>
-              {spotlight.spotlight_subtitle && (
-                <p className="text-base text-gray-500 mt-1">{spotlight.spotlight_subtitle}</p>
-              )}
-            </div>
-            {/* Image — centered */}
-            {spotlight.spotlight_image && (
-              <div className="flex items-center justify-center w-full" style={{ minHeight: '380px' }}>
-                <img
-                  src={spotlight.spotlight_image}
-                  alt={spotlight.spotlight_title}
-                  className="object-contain"
-                  style={{ maxHeight: '320px', maxWidth: '60%' }}
-                />
-              </div>
-            )}
-            {/* Price — bottom left */}
-            {spotlight.spotlight_price && (
-              <div className="absolute bottom-8 left-8 z-10">
-                <p className="text-sm text-gray-500">{spotlight.spotlight_price_prefix || 'From'}</p>
-                <p className="text-3xl font-bold text-gray-900">{spotlight.spotlight_price}</p>
-              </div>
-            )}
-            {/* Arrow — bottom right */}
-            {spotlight.spotlight_link && (
-              <a
-                href={spotlight.spotlight_link}
-                className="absolute bottom-0 right-0 z-10 w-16 h-16 bg-black flex items-center justify-center hover:bg-gray-800 transition-colors"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="7" y1="17" x2="17" y2="7" />
-                  <polyline points="7 7 17 7 17 17" />
-                </svg>
-              </a>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Fullscreen Modal */}
       {isFullscreen && (
