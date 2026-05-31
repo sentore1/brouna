@@ -4,8 +4,8 @@ import { supabase } from '../../../lib/supabase'
 export const dynamic = 'force-dynamic'
 
 // Fire-and-forget helper — never throws, never blocks the response
-function track(promise: Promise<unknown>) {
-  promise.catch(() => {})
+function track(promise: PromiseLike<unknown>) {
+  Promise.resolve(promise).catch(() => {})
 }
 
 export async function POST(request: NextRequest) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
       if (data.sessionId) {
         // Upsert session without blocking — read then write async
-        supabase
+        Promise.resolve(supabase
           .from('user_sessions')
           .select('session_id, pages_visited')
           .eq('session_id', data.sessionId)
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
                 device_type: deviceType
               }).then())
             }
-          })
+          }))
           .catch(() => {})
       }
     }
