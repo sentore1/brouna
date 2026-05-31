@@ -242,12 +242,17 @@ export default function AdminDashboard() {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('id, name, price, description, category, image, images, stock, currency, created_at, slug, sizes, colors, sale_end_date, viewers_count, seo_title, seo_description, seo_keywords')
         .order('created_at', { ascending: false })
+        .limit(50)
       
+      console.log('[fetchProducts] data:', data, 'error:', error)
+      if (error) {
+        console.error('[fetchProducts] Supabase error:', error.message, error.code, error.details)
+      }
       if (data && !error) setProducts(data)
     } catch (error) {
-      console.error('Error fetching products:', error)
+      console.error('[fetchProducts] Exception:', error)
     }
   }
 
@@ -649,7 +654,7 @@ export default function AdminDashboard() {
                         }}
                         maxLength={60}
                         className="w-full p-2 border rounded text-sm"
-                        placeholder={`${product.name} - Luxury ${product.category} | SIZA`}
+                        placeholder={`${product.name} - ${product.category} | brouna`}
                       />
                     </div>
                     <div>
@@ -664,7 +669,7 @@ export default function AdminDashboard() {
                         maxLength={160}
                         rows={2}
                         className="w-full p-2 border rounded text-sm"
-                        placeholder={`Shop ${product.name} at SIZA. Premium quality ${product.category}...`}
+                        placeholder={`Shop ${product.name} at brouna. Premium quality ${product.category}...`}
                       />
                     </div>
                     <div>
@@ -678,7 +683,7 @@ export default function AdminDashboard() {
                           fetchProducts()
                         }}
                         className="w-full p-2 border rounded text-sm"
-                        placeholder={`luxury ${product.category}, designer wear, ${product.name}, SIZA`}
+                        placeholder={`${product.category}, designer wear, ${product.name}, brouna`}
                       />
                     </div>
                   </div>
@@ -1859,7 +1864,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setFormData({ ...formData, seo_title: e.target.value })}
                       maxLength={60}
                       className="w-full p-2 border rounded text-sm"
-                      placeholder={`${formData.name} - Luxury ${formData.category} | SIZA`}
+                      placeholder={`${formData.name} - ${formData.category} | brouna`}
                     />
                   </div>
                   <div>
@@ -1870,7 +1875,7 @@ export default function AdminDashboard() {
                       maxLength={160}
                       rows={2}
                       className="w-full p-2 border rounded text-sm"
-                      placeholder="Shop product at SIZA. Premium quality..."
+                      placeholder="Shop product at brouna. Premium quality..."
                     />
                   </div>
                   <div>
@@ -1880,7 +1885,7 @@ export default function AdminDashboard() {
                       value={formData.seo_keywords}
                       onChange={(e) => setFormData({ ...formData, seo_keywords: e.target.value })}
                       className="w-full p-2 border rounded text-sm"
-                      placeholder="luxury fashion, designer wear, product name"
+                      placeholder="fashion, designer wear, product name"
                     />
                   </div>
                 </div>

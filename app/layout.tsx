@@ -17,23 +17,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SIZA - Luxury High-End Fashion & Designer Clothing",
-  description: "Discover luxury high-end fashion at SIZA. Shop premium designer clothing, elegant dresses, sophisticated accessories, and timeless pieces crafted for the modern wardrobe.",
-  keywords: "luxury fashion, high-end clothing, designer wear, premium apparel, elegant dresses, sophisticated style, luxury brand, designer fashion, exclusive clothing, SIZA",
-  authors: [{ name: "SIZA" }],
+  title: "brouna - High-End Fashion & Designer Clothing",
+  description: "Discover high-end fashion at brouna. Shop premium designer clothing, elegant dresses, sophisticated accessories, and timeless pieces crafted for the modern wardrobe.",
+  keywords: "fashion, high-end clothing, designer wear, premium apparel, elegant dresses, sophisticated style, designer fashion, exclusive clothing, brouna",
+  authors: [{ name: "brouna" }],
   openGraph: {
-    title: "SIZA - Luxury High-End Fashion & Designer Clothing",
-    description: "Discover luxury high-end fashion at SIZA. Shop premium designer clothing, elegant dresses, sophisticated accessories, and timeless pieces.",
-    url: "https://SIZA.com",
-    siteName: "SIZA",
+    title: "brouna - High-End Fashion & Designer Clothing",
+    description: "Discover high-end fashion at brouna. Shop premium designer clothing, elegant dresses, sophisticated accessories, and timeless pieces.",
+    url: "https://brouna.com",
+    siteName: "brouna",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SIZA - Luxury High-End Fashion",
-    description: "Shop premium designer clothing and luxury fashion at SIZA",
+    title: "brouna - High-End Fashion",
+    description: "Shop premium designer clothing and fashion at brouna",
     images: ["/og-image.jpg"],
   },
   robots: {

@@ -56,7 +56,7 @@ export default function Navbar({
       case 'classic':
         return 'bg-white border-b-2 border-white'
       case 'modern':
-        return 'bg-gradient-to-r from-gray-50 to-white border-b border-white'
+        return 'bg-white border-b border-white'
       default:
         return 'bg-white border-b border-white'
     }

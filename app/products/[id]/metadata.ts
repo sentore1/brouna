@@ -8,7 +8,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   
   if (!product) {
     return {
-      title: 'Product Not Found | SIZA',
+      title: 'Product Not Found | brouna',
       description: 'The product you are looking for could not be found.',
     }
   }

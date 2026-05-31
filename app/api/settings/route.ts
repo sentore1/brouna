@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '../../../lib/supabase'
 
+export const revalidate = 60 // cache for 60 seconds
+
 export async function GET() {
   try {
     const { data, error } = await supabase.from('site_settings').select('*').single()
@@ -11,19 +13,22 @@ export async function GET() {
       try {
         const parsed = JSON.parse(data.site_logo)
         if (parsed.momo) {
-          return NextResponse.json({ ...data, ...parsed.momo, site_logo: parsed.logo || '' })
+          const res = NextResponse.json({ ...data, ...parsed.momo, site_logo: parsed.logo || '' })
+          res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120')
+          return res
         }
       } catch {}
     }
     
-    // Add Polar settings with defaults
     const settings = {
       ...data,
       payment_polar_enabled: data?.payment_polar_enabled ?? false,
       polar_product_id: data?.polar_product_id ?? '',
     }
     
-    return NextResponse.json(settings)
+    const res = NextResponse.json(settings)
+    res.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120')
+    return res
   } catch {
     return NextResponse.json({
       payment_polar_enabled: false,

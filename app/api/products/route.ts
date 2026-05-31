@@ -5,8 +5,9 @@ export async function GET() {
   try {
     const { data: products, error } = await supabase
       .from('products')
-      .select('*')
+      .select('id, name, price, category, image, stock, currency, created_at, slug, sizes, colors, sale_end_date, viewers_count')
       .order('created_at', { ascending: false })
+      .limit(100)
 
     if (error) {
       console.error('Supabase error:', error)

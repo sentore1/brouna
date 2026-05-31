@@ -82,7 +82,13 @@ export default function Footer() {
               src={settings.site_logo}
               alt={settings.site_name}
               className="mb-3"
-              style={{ height: `${settings.footer_logo_size}px` }}
+              style={{ 
+                height: `${settings.footer_logo_size || 150}px`,
+                width: 'auto',
+                objectFit: 'contain',
+                maxHeight: '200px',
+                maxWidth: '400px'
+              }}
             />
           ) : (
             <h2

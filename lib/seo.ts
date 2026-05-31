@@ -1,17 +1,17 @@
 import { Metadata } from 'next'
 
 export const siteConfig = {
-  name: 'SIZA',
-  description: 'Luxury high-end fashion brand offering premium designer clothing, elegant dresses, sophisticated accessories, and timeless pieces for the modern wardrobe',
-  url: 'https://SIZA.com',
+  name: 'brouna',
+  description: 'High-end fashion brand offering premium designer clothing, elegant dresses, sophisticated accessories, and timeless pieces for the modern wardrobe',
+  url: 'https://brouna.com',
   ogImage: '/og-image.jpg',
-  keywords: 'luxury fashion, high-end clothing, designer wear, premium apparel, elegant dresses, sophisticated style, luxury brand, designer fashion, exclusive clothing, SIZA'
+  keywords: 'fashion, high-end clothing, designer wear, premium apparel, elegant dresses, sophisticated style, designer fashion, exclusive clothing, brouna'
 }
 
 export function generateProductMetadata(product: any): Metadata {
-  const title = product.seo_title || `${product.name} - Luxury Fashion | SIZA`
-  const description = product.seo_description || `Shop ${product.name} at SIZA. Premium quality ${product.category} crafted for discerning fashion enthusiasts.`
-  const keywords = product.seo_keywords || `luxury ${product.category}, high-end fashion, designer ${product.category}, ${product.name}`
+  const title = product.seo_title || `${product.name} - Fashion | brouna`
+  const description = product.seo_description || `Shop ${product.name} at brouna. Premium quality ${product.category} crafted for discerning fashion enthusiasts.`
+  const keywords = product.seo_keywords || `${product.category}, high-end fashion, designer ${product.category}, ${product.name}`
   
   return {
     title,
@@ -33,11 +33,11 @@ export function generateProductMetadata(product: any): Metadata {
 
 export function generatePageMetadata(title: string, description: string, path: string = ''): Metadata {
   return {
-    title: `${title} | SIZA`,
+    title: `${title} | brouna`,
     description,
     keywords: siteConfig.keywords,
     openGraph: {
-      title: `${title} | SIZA`,
+      title: `${title} | brouna`,
       description,
       url: `${siteConfig.url}${path}`,
       siteName: siteConfig.name,
@@ -46,7 +46,7 @@ export function generatePageMetadata(title: string, description: string, path: s
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} | SIZA`,
+      title: `${title} | brouna`,
       description,
       images: [siteConfig.ogImage],
     },
@@ -62,7 +62,7 @@ export function generateProductJsonLd(product: any) {
     image: product.images || [product.image],
     brand: {
       '@type': 'Brand',
-      name: 'SIZA'
+      name: 'brouna'
     },
     offers: {
       '@type': 'Offer',
@@ -83,14 +83,14 @@ export function generateOrganizationJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'ClothingStore',
-    name: 'SIZA',
+    name: 'brouna',
     description: siteConfig.description,
     url: siteConfig.url,
     logo: `${siteConfig.url}/Logo-dark.png`,
     sameAs: [
-      'https://facebook.com/SIZA',
-      'https://instagram.com/SIZA',
-      'https://twitter.com/SIZA'
+      'https://facebook.com/brouna',
+      'https://instagram.com/brouna',
+      'https://twitter.com/brouna'
     ]
   }
 }

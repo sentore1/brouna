@@ -52,7 +52,7 @@ export default function SEOEditor({ productId, initialData }: SEOEditorProps) {
             onChange={(e) => setSeoTitle(e.target.value)}
             maxLength={60}
             className="w-full border rounded px-3 py-2"
-            placeholder="Product Name - Luxury Fashion | SIZA"
+            placeholder="Product Name - Fashion | brouna"
           />
           <p className="text-xs text-gray-500 mt-1">Optimal: 50-60 characters</p>
         </div>
@@ -67,7 +67,7 @@ export default function SEOEditor({ productId, initialData }: SEOEditorProps) {
             maxLength={160}
             rows={3}
             className="w-full border rounded px-3 py-2"
-            placeholder="Shop [product] at SIZA. Premium quality [category] crafted for discerning fashion enthusiasts."
+            placeholder="Shop [product] at brouna. Premium quality [category] crafted for discerning fashion enthusiasts."
           />
           <p className="text-xs text-gray-500 mt-1">Optimal: 150-160 characters</p>
         </div>
@@ -98,7 +98,7 @@ export default function SEOEditor({ productId, initialData }: SEOEditorProps) {
       <div className="mt-6 p-4 bg-gray-50 rounded">
         <h4 className="text-sm font-semibold mb-2">Search Preview</h4>
         <div className="text-blue-600 text-lg">{seoTitle || 'Product Title'}</div>
-        <div className="text-green-700 text-xs">SIZA.com › products › product-name</div>
+        <div className="text-green-700 text-xs">brouna.com › products › product-name</div>
         <div className="text-sm text-gray-600 mt-1">{seoDescription || 'Product description...'}</div>
       </div>
     </div>

@@ -3,6 +3,11 @@ import { supabase } from '../../../lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
+// Fire-and-forget helper — never throws, never blocks the response
+function track(promise: Promise<unknown>) {
+  promise.catch(() => {})
+}
+
 export async function POST(request: NextRequest) {
   try {
     const text = await request.text()
@@ -18,7 +23,7 @@ export async function POST(request: NextRequest) {
     const browser = userAgent.includes('Chrome') ? 'Chrome' : userAgent.includes('Firefox') ? 'Firefox' : userAgent.includes('Safari') ? 'Safari' : 'Other'
 
     if (type === 'pageview') {
-      await supabase.from('page_views').insert({
+      track(supabase.from('page_views').insert({
         page_url: data.url,
         page_title: data.title,
         referrer: data.referrer,
@@ -26,84 +31,82 @@ export async function POST(request: NextRequest) {
         ip_address: ip,
         device_type: deviceType,
         browser: browser
-      })
+      }))
 
-      // Update session
       if (data.sessionId) {
-        const { data: session } = await supabase
+        // Upsert session without blocking — read then write async
+        supabase
           .from('user_sessions')
-          .select('*')
+          .select('session_id, pages_visited')
           .eq('session_id', data.sessionId)
           .single()
-
-        if (session) {
-          await supabase
-            .from('user_sessions')
-            .update({
-              last_page: data.url,
-              pages_visited: (session.pages_visited || 0) + 1,
-              updated_at: new Date().toISOString()
-            })
-            .eq('session_id', data.sessionId)
-        } else {
-          await supabase.from('user_sessions').insert({
-            session_id: data.sessionId,
-            first_page: data.url,
-            last_page: data.url,
-            referrer: data.referrer,
-            device_type: deviceType
+          .then(({ data: session }) => {
+            if (session) {
+              track(supabase
+                .from('user_sessions')
+                .update({ last_page: data.url, pages_visited: (session.pages_visited || 0) + 1, updated_at: new Date().toISOString() })
+                .eq('session_id', data.sessionId))
+            } else {
+              track(supabase.from('user_sessions').insert({
+                session_id: data.sessionId,
+                first_page: data.url,
+                last_page: data.url,
+                referrer: data.referrer,
+                device_type: deviceType
+              }))
+            }
           })
-        }
+          .catch(() => {})
       }
     }
 
     if (type === 'click') {
-      await supabase.from('click_events').insert({
+      track(supabase.from('click_events').insert({
         element_type: data.elementType,
         element_text: data.elementText,
         page_url: data.pageUrl,
         product_id: data.productId,
         user_agent: userAgent,
         ip_address: ip
-      })
+      }))
     }
 
     if (type === 'cart_add') {
-      await supabase.from('cart_events').insert({
+      track(supabase.from('cart_events').insert({
         session_id: data.sessionId,
         event_type: 'add',
         product_id: data.productId,
         product_name: data.productName,
         quantity: data.quantity,
         price: data.price
-      })
+      }))
     }
 
     if (type === 'purchase') {
-      await supabase.from('conversion_events').insert({
+      track(supabase.from('conversion_events').insert({
         session_id: data.sessionId,
         event_type: 'purchase',
         order_id: data.orderId,
         amount: data.amount,
         currency: data.currency
-      })
+      }))
 
       for (const product of data.products || []) {
-        await supabase.from('conversion_events').insert({
+        track(supabase.from('conversion_events').insert({
           session_id: data.sessionId,
           event_type: 'product_purchase',
           product_id: product.id,
           product_name: product.name,
           amount: product.price * product.quantity,
           currency: data.currency
-        })
+        }))
       }
     }
 
+    // Respond immediately — writes happen in background
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Analytics error:', error)
-    return NextResponse.json({ error: 'Failed to track' }, { status: 500 })
+    return NextResponse.json({ success: true })
   }
 }
 

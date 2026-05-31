@@ -94,25 +94,28 @@ function SliderHero({ section }: { section: any }) {
 function BrandWidget({ section }: { section: any }) {
   return (
     <section
-      className="relative overflow-hidden select-none w-full flex items-center justify-center"
+      className="relative overflow-visible select-none w-full flex flex-col items-center justify-start"
       style={{
-        backgroundColor: '#ffffff',
+        backgroundColor: 'transparent',
         borderRadius: `${section.hero_border_radius || 0}px`,
-        height: `${section.hero_height || 700}px`,
+        minHeight: `min(${section.hero_height || 700}px, 100vw)`,
       }}
     >
       {/* Big text — pinned to TOP, full width, behind everything */}
       {section.brand_bg_text && (
         <div className="absolute top-0 left-0 w-full pointer-events-none z-0 overflow-hidden">
           <span
-            className="font-black block w-full"
+            className="font-black block w-full mix-blend-multiply"
             style={{
-              fontSize: `${section.brand_bg_text_size || 180}px`,
+              // ~6 chars per line max → each char ≈ 16vw keeps longest word inside viewport
+              fontSize: `min(${section.brand_bg_text_size || 180}px, 16vw)`,
               color: section.brand_bg_text_color || '#000000',
-              opacity: section.brand_bg_text_opacity ?? 1,
+              opacity: section.brand_bg_text_opacity ?? 0.15,
               letterSpacing: '-0.03em',
               lineHeight: 0.88,
               textAlign: 'center',
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
             }}
           >
             {section.brand_bg_text}
@@ -123,32 +126,34 @@ function BrandWidget({ section }: { section: any }) {
       {/* Center image box — sits on top of text */}
       {section.brand_image_url && (
         <div
-          className="relative z-10 h-full flex items-center justify-center overflow-hidden"
-          style={{ width: '45%', maxWidth: '500px' }}
+          className="relative z-10 flex items-center justify-center overflow-hidden w-full sm:w-[45%] sm:max-w-[500px] -mt-12 sm:-mt-16"
+          style={{
+            height: `clamp(500px, ${section.hero_height || 700}px, ${section.hero_height || 700}px)`,
+          }}
         >
           <img
             src={section.brand_image_url}
             alt="brand"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             style={{ pointerEvents: 'none' }}
           />
-          {/* Gradient overlay — bottom fade like reference */}
+          {/* Gradient overlay — fade from white at bottom to transparent going up */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, transparent 75%, rgba(255,255,255,1) 100%)',
+              background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 15%, rgba(255,255,255,0.7) 25%, transparent 35%)',
             }}
           />
           {/* Buttons inside image box at bottom */}
           {(section.brand_btn1_text || section.brand_btn2_text) && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-wrap gap-2 z-10 justify-center px-2">
               {section.brand_btn1_text && (
-                <a href={section.brand_btn1_link || '#'} className="bg-black text-white px-5 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">
+                <a href={section.brand_btn1_link || '#'} className="bg-black text-white px-4 py-2 text-xs sm:text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap">
                   {section.brand_btn1_text}
                 </a>
               )}
               {section.brand_btn2_text && (
-                <a href={section.brand_btn2_link || '#'} className="border border-black text-black bg-white px-5 py-2 text-sm font-medium hover:bg-black hover:text-white transition-colors">
+                <a href={section.brand_btn2_link || '#'} className="border border-black text-black bg-white px-4 py-2 text-xs sm:text-sm font-medium hover:bg-black hover:text-white transition-colors whitespace-nowrap">
                   {section.brand_btn2_text}
                 </a>
               )}
@@ -157,24 +162,25 @@ function BrandWidget({ section }: { section: any }) {
         </div>
       )}
 
-      {/* Badge — left side, bottom of section */}
-      {section.brand_badge_text && (
-        <div className="absolute left-8 z-20 bottom-6">
-          <span className="font-semibold text-gray-900 tracking-wide" style={{ fontSize: '3.5rem' }}>
+      {/* Badge + overlay text — positioned to overlay the bottom gradient area of the image */}
+      <div className="absolute bottom-16 sm:bottom-6 left-0 right-0 z-20 flex flex-col sm:flex-row sm:items-end sm:justify-between px-4 sm:px-8 gap-1 sm:gap-0">
+        {section.brand_badge_text && (
+          <span
+            className="font-semibold text-gray-900 tracking-wide leading-none"
+            style={{ fontSize: 'clamp(1.5rem, 6vw, 3.5rem)' }}
+          >
             {section.brand_badge_text}
           </span>
-        </div>
-      )}
-
-      {/* Overlay text — right side, bottom of section */}
-      {section.brand_overlay_text && (
-        <div className="absolute z-20 bottom-6" style={{ left: '76%', right: '2rem' }}>
-          <p className="text-xs text-gray-500 leading-relaxed">{section.brand_overlay_text}</p>
-          {section.brand_overlay_subtext && (
-            <p className="text-xs text-gray-400 mt-1">{section.brand_overlay_subtext}</p>
-          )}
-        </div>
-      )}
+        )}
+        {section.brand_overlay_text && (
+          <div className="sm:max-w-[22%] sm:text-right">
+            <p className="text-xs text-gray-500 leading-relaxed">{section.brand_overlay_text}</p>
+            {section.brand_overlay_subtext && (
+              <p className="text-xs text-gray-400 mt-1">{section.brand_overlay_subtext}</p>
+            )}
+          </div>
+        )}
+      </div>
     </section>
   )
 }
@@ -232,9 +238,9 @@ function ReviewCard({ reviews, offset }: { reviews: any[], offset: number }) {
   const review = reviews[index]
   return (
     <div
-      className="bg-white p-5"
+      className="bg-white p-3 sm:p-5"
       style={{
-        borderRadius: '24px',
+        borderRadius: '16px',
         opacity: visible ? 1 : 0,
         filter: visible ? 'blur(0px)' : 'blur(6px)',
         transform: visible ? 'scale(1)' : 'scale(0.94)',
@@ -242,15 +248,15 @@ function ReviewCard({ reviews, offset }: { reviews: any[], offset: number }) {
         boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
       }}
     >
-      <div className="flex gap-0.5 mb-1.5">
+      <div className="flex gap-0.5 mb-1">
         {Array.from({ length: 5 }).map((_, i) => (
-          <svg key={i} className={`w-2.5 h-2.5 ${i < (review.rating ?? 5) ? 'text-black' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+          <svg key={i} className={`w-2 h-2 sm:w-2.5 sm:h-2.5 ${i < (review.rating ?? 5) ? 'text-black' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
         ))}
       </div>
-      <p className="text-[9px] text-gray-500 leading-relaxed mb-1.5 line-clamp-3">{review.text}</p>
-      <p className="text-[9px] font-semibold text-gray-700">{review.author}</p>
+      <p className="text-[8px] sm:text-[9px] text-gray-500 leading-relaxed mb-1 sm:mb-1.5 line-clamp-3">{review.text}</p>
+      <p className="text-[8px] sm:text-[9px] font-semibold text-gray-700">{review.author}</p>
     </div>
   )
 }
@@ -260,7 +266,7 @@ function ReviewsSection({ reviews }: { reviews: any[] }) {
   const slots = Math.min(10, reviews.length)
   return (
     <div className="mt-16 mb-4 w-full">
-      <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))' }}>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {Array.from({ length: slots }).map((_, i) => (
           <ReviewCard key={i} reviews={reviews} offset={i} />
         ))}
@@ -524,13 +530,6 @@ export default function Home() {
           <div key={section.id} className="mt-8"><HeroSection section={section} /></div>
         ))}
 
-        {/* Reviews Section */}
-        {reviews.length > 0 && (siteSettings as any).reviews_enabled !== false && (
-          <div className="mb-16">
-            <ReviewsSection reviews={reviews} />
-          </div>
-        )}
-
         {/* Product Spotlight Widget */}
         {(siteSettings as any).spotlight_enabled && (siteSettings as any).spotlight_title && (
           <div className="mt-12 mb-4 w-full">
@@ -579,6 +578,13 @@ export default function Home() {
                 </a>
               )}
             </div>
+
+            {/* Reviews Section inside Spotlight */}
+            {reviews.length > 0 && (siteSettings as any).reviews_enabled !== false && (
+              <div className="mt-8">
+                <ReviewsSection reviews={reviews} />
+              </div>
+            )}
           </div>
         )}
       </main>
