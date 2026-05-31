@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         ip_address: ip,
         device_type: deviceType,
         browser: browser
-      }))
+      }).then())
 
       if (data.sessionId) {
         // Upsert session without blocking — read then write async
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
               track(supabase
                 .from('user_sessions')
                 .update({ last_page: data.url, pages_visited: (session.pages_visited || 0) + 1, updated_at: new Date().toISOString() })
-                .eq('session_id', data.sessionId))
+                .eq('session_id', data.sessionId).then())
             } else {
               track(supabase.from('user_sessions').insert({
                 session_id: data.sessionId,
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
                 last_page: data.url,
                 referrer: data.referrer,
                 device_type: deviceType
-              }))
+              }).then())
             }
           })
           .catch(() => {})
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         product_id: data.productId,
         user_agent: userAgent,
         ip_address: ip
-      }))
+      }).then())
     }
 
     if (type === 'cart_add') {
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         product_name: data.productName,
         quantity: data.quantity,
         price: data.price
-      }))
+      }).then())
     }
 
     if (type === 'purchase') {
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         order_id: data.orderId,
         amount: data.amount,
         currency: data.currency
-      }))
+      }).then())
 
       for (const product of data.products || []) {
         track(supabase.from('conversion_events').insert({
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
           product_name: product.name,
           amount: product.price * product.quantity,
           currency: data.currency
-        }))
+        }).then())
       }
     }
 
